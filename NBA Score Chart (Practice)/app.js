@@ -84,25 +84,44 @@ const warriorsGames = [{
 }
 ]
 
-const ulParent = document.createElement('ul');
-for (let game of warriorsGames) {
-  const { homeTeam, awayTeam } = game;
-  const { team: hTeam, points: hPoints } = homeTeam;
-  const { team: aTeam, points: aPoints } = awayTeam;
-  const gameLi = document.createElement('li');
-  const teamName = `${aTeam} @ ${hTeam}`;
-  // console.log(awayTeam.team, homeTeam.team);
-  let scoreLine;
-  if(aPoints> hPoints){
-    scoreLine = `<b>${aPoints}</b>-${hPoints}`;
-  }else{
-    scoreLine = `${aPoints}-<b>${hPoints}</b>`;
+const makeChart = (games, targetTeam) => {
+  const ulParent = document.createElement('ul');
+  for (let game of games) {
+    const gameLi = document.createElement('li');
+    // console.log(awayTeam.team, homeTeam.team);
+
+    gameLi.classList.add(isWinner(game, targetTeam) ? 'win' : 'loss');
+    gameLi.innerHTML = getScoreLine(game);
+    // console.log(scoreLine);
+    ulParent.appendChild(gameLi);
   }
-  const worriors = hTeam === 'Golden State' ? homeTeam : awayTeam;
-  gameLi.classList.add(worriors.isWinner?'win':'loss');
-  gameLi.innerHTML = `${teamName} ${scoreLine}`;
-  // console.log(scoreLine);
-  ulParent.appendChild(gameLi);
+  return ulParent;
 }
 
-document.body.prepend(ulParent);
+const isWinner = ({ homeTeam, awayTeam },targetTeam) => {
+  const target = homeTeam.team === targetTeam ? homeTeam : awayTeam;
+  return target.isWinner;
+}
+
+const getScoreLine = ({ homeTeam, awayTeam }) => {
+  const { team: hTeam, points: hPoints } = homeTeam;
+  const { team: aTeam, points: aPoints } = awayTeam;
+  const teamName = `${aTeam} @ ${hTeam}`;
+  let scoreLine;
+  if (aPoints > hPoints) {
+    scoreLine = `${aPoints}-<b>${hPoints}</b>`;
+  } else {
+    scoreLine = `<b>${aPoints}</b>-${hPoints}`;
+  }
+  return `${teamName} ${scoreLine}`;
+
+}
+
+
+const gsSection = document.querySelector('#gs');
+const houstonSection = document.querySelector('#hr');
+const gschart= makeChart(warriorsGames,'Golden State');
+const hrchart= makeChart(warriorsGames,'Houston');
+
+gsSection.appendChild(gschart);
+houstonSection.appendChild(hrchart);
